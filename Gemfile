@@ -52,6 +52,10 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 end
 
+group :test do
+  gem 'rspec-rails'
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
@@ -64,4 +68,3 @@ group :development do
 
   gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
 end
-
