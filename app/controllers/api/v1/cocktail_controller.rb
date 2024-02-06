@@ -1,4 +1,4 @@
-class Api::V1::CocktailController < ApplicationController
+class Api::V1::BartenderController < ApplicationController
   def index
   end
 
