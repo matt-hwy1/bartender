@@ -42,6 +42,9 @@ end
 
 group :test do
   gem 'rspec-rails'
+  gem "factory_bot"
+  gem "json_matchers"
+  gem "faker"
 end
 
 group :development do
