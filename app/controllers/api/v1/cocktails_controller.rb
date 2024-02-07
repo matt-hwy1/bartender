@@ -3,7 +3,8 @@ class Api::V1::CocktailsController < ApplicationController
     if params[:q].present? && params[:q].length >= 3
       render json: { cocktails: Cocktail.includes(:ingredients).where("name LIKE ?", "%#{params[:q]}%") }
     else
-      render json: { error: "The cocktail search parameter must be at least 3 characters long"}
+      render json: { error: { message: "The cocktail search text must be at least 3 characters long" } },
+              status: :bad_request
     end
   end
 
