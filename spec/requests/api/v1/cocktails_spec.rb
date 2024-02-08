@@ -1,52 +1,104 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Cocktails", type: :request do
-  describe "Error handling" do
-    it "returns an error method when no search parameter is passed" do
-      get api_search_path
-      expect(response).to have_http_status(200)
+  let!(:cocktail) { FactoryBot.create(:cocktail_with_ingredients, name: "Vodka tonic") }
+  let(:query) { "vod" }
 
-      # Response contains error message
-      json = JSON.parse(response.body)
-      expect(json).to eq []
+  describe "error handling" do
+    it "returns an empty array when no search parameter is passed" do
+      get api_search_path
+
+      response_json = JSON.parse(response.body)
+      expect(response).to have_http_status(200)
+      expect(response_json).to eq []
     end
 
-    it "returns an error message when a too short search parameter is passed" do
-      get api_search_path(query: "ab")
-      expect(response).to have_http_status(200)
+    it "returns an empty array when a too short search parameter is passed" do
+      get api_search_path(query: "a")
 
-      # Response contains error message
-      json = JSON.parse(response.body)
-      expect(json).to eq []
+      response_json = JSON.parse(response.body)
+      expect(response).to have_http_status(200)
+      expect(response_json).to eq []
+    end
+
+    it "returns an empty array when out of bounds pagination parameters are received" do
+      get api_search_path(query: query, offset: 5, limit: 10)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      expect(response).to have_http_status(200)
+      expect(response_json[:drinks]).to be_blank
     end
   end
 
-  describe "valid requests" do
-    let(:cocktail) {
-      FactoryBot.create(:cocktail_with_ingredients, name: "Vodka tonic")
-    }
-    let(:query) { "vod" }
-
-    before do
-      expect(Cocktail).to receive(:search).with(query, nil, nil).and_return(cocktail)
-    end
-
+  describe "valid search requests" do
     it "returns a database result when a search query is received" do
       get api_search_path(query: query)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      drink = response_json[:drinks].first
+
       expect(response).to have_http_status(200)
 
-      # Response contains error message
-      json = JSON.parse(response.body).deep_symbolize_keys
-      puts json.inspect
+      expect(drink[:name]).to eq cocktail.name
+      expect(drink[:category]).to eq cocktail.category
+      expect(drink[:container]).to eq cocktail.container
+      expect(drink[:instructions]).to eq cocktail.instructions
+      expect(drink[:image]).to eq cocktail.image
+      expect(drink[:ingredients].size).to eq 1
+      expect(drink[:ingredients].first[:name]).to eq cocktail.ingredients.first.name
+      expect(drink[:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
+    end
 
-      expect(json[:drinks][:name]).to eq cocktail.name
-      expect(json[:drinks][:category]).to eq cocktail.category
-      expect(json[:drinks][:container]).to eq cocktail.container
-      expect(json[:drinks][:instructions]).to eq cocktail.instructions
-      expect(json[:drinks][:image]).to eq cocktail.image
-      expect(json[:drinks][:ingredients].size).to eq 1
-      expect(json[:drinks][:ingredients].first[:name]).to eq cocktail.ingredients.first.name
-      expect(json[:drinks][:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
+    it "calls the search function with the received pagination parameters" do
+      get api_search_path(query: query, offset: 0, limit: 10)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      drink = response_json[:drinks].first
+
+      expect(response).to have_http_status(200)
+
+      expect(drink[:name]).to eq cocktail.name
+      expect(drink[:category]).to eq cocktail.category
+      expect(drink[:container]).to eq cocktail.container
+      expect(drink[:instructions]).to eq cocktail.instructions
+      expect(drink[:image]).to eq cocktail.image
+      expect(drink[:ingredients].size).to eq 1
+      expect(drink[:ingredients].first[:name]).to eq cocktail.ingredients.first.name
+      expect(drink[:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
+    end
+
+    it "returns the correct cocktail by id" do
+      get api_detail_path(id: cocktail.id)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      drink = response_json[:drinks].first
+
+      expect(response).to have_http_status(200)
+
+      expect(drink[:name]).to eq cocktail.name
+      expect(drink[:category]).to eq cocktail.category
+      expect(drink[:container]).to eq cocktail.container
+      expect(drink[:instructions]).to eq cocktail.instructions
+      expect(drink[:image]).to eq cocktail.image
+      expect(drink[:ingredients].size).to eq 1
+      expect(drink[:ingredients].first[:name]).to eq cocktail.ingredients.first.name
+      expect(drink[:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
+    end
+
+    it "queries the database using the received pagination parameters" do
+      ("a".."z").each do |index|
+        FactoryBot.create(:cocktail, name: "Cocktail #{index}")
+      end
+
+      get api_search_path(query: "ocktail", offset: 20, limit: 10)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      drinks = response_json[:drinks]
+
+      expect(response).to have_http_status(200)
+      expect(drinks.size).to eq(6)
+      expected_results = ["Cocktail u", "Cocktail v", "Cocktail w", "Cocktail x", "Cocktail y", "Cocktail z"]
+      expect(drinks.map { |d| d[:name] }).to eq(expected_results)
     end
   end
 end
