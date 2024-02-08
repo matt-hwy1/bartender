@@ -1,14 +1,21 @@
 class Api::V1::CocktailsController < ApplicationController
+  # Clear improvements here would be:
+  # Authentication of the API
+  # Factor out the JSON generation into a JSON serialization library like JBuilder
+  #   or ActiveModel serializers
+  # Implement full-text searching in the database and queries if it grows in size
+
+  # TODO: Add pagination
+
   def index
-    if params[:q].present? && params[:q].length >= 3
-      render json: { cocktails: Cocktail.includes(:ingredients).where("name LIKE ?", "%#{params[:q]}%") }
+    if params[:query].present? && params[:query].length >= 3
+      render json: { cocktails: Cocktail.search(params[:query]) }
     else
-      render json: { error: { message: "The cocktail search text must be at least 3 characters long" } },
-              status: :bad_request
+      render json: []
     end
   end
 
   def show
-    render json: { cocktail: Cocktail.includes(:ingredients).find(params[:id]).to_api_json }
+    render json: { cocktail: Cocktail.includes(:ingredients).find(params[:id]) }
   end
 end
