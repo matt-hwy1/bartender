@@ -4,7 +4,9 @@ class Cocktail < ApplicationRecord
   validates :name, :category, :container, :instructions, :image, presence: true
   validates :name, uniqueness: true
 
-  scope :search, ->(query) { includes(:ingredients).where("name LIKE ?", "%#{query}%") }
+  scope :search, ->(query, offset = 0, limit = 100) { includes(:ingredients).where("name LIKE ?", "%#{query}%")
+                                                    .offset(offset).limit(limit)
+                    }
 
   def as_json(options = nil)
     super({ only: [:id, :name, :category, :container, :instructions, :image],

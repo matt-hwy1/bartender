@@ -1,4 +1,4 @@
-class Api::V1::CocktailsController < ApplicationController
+class Api::CocktailsController < ApplicationController
   # Clear improvements here would be:
   # Authentication of the API
   # Factor out the JSON generation into a JSON serialization library like JBuilder
@@ -9,7 +9,7 @@ class Api::V1::CocktailsController < ApplicationController
 
   def index
     if params[:query].present? && params[:query].length >= 3
-      render json: { cocktails: Cocktail.search(params[:query]) }
+      render json: { drinks: Cocktail.search(params[:query], params[:index], params[:limit]) }
     else
       render json: []
     end

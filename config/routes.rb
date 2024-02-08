@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   namespace :api do
-    namespace :v1 do
-      resources :cocktails, only: [:index, :show]
-    end
+    get "search", to: "cocktails#index"
+    get "detail", to: "cocktails#show"
   end
 end
