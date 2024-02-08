@@ -38,4 +38,24 @@ RSpec.describe Cocktail, type: :model do
       expect(cocktail2).not_to be_valid
     end
   end
+
+  describe "search" do
+    let!(:matching_cocktails) {
+      [
+        FactoryBot.create(:cocktail, name: "Vodka Tonic"),
+        FactoryBot.create(:cocktail, name: "Chocolate Vodka Cranberry")
+      ]
+    }
+
+    let!(:non_matching_cocktails) {
+      [
+        FactoryBot.create(:cocktail, name: "Gin & Tonic"),
+        FactoryBot.create(:cocktail, name: "Rum Punch")
+      ]
+    }
+
+    it "returns records matching the search string" do
+      expect(Cocktail.search("vod").to_a).to match_array(matching_cocktails)
+    end
+  end
 end
