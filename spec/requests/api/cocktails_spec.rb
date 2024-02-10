@@ -8,17 +8,17 @@ RSpec.describe "Api::Cocktails", type: :request do
     it "returns an empty array when no search parameter is passed" do
       get api_search_path
 
-      response_json = JSON.parse(response.body)
+      response_json = JSON.parse(response.body).deep_symbolize_keys
       expect(response).to have_http_status(200)
-      expect(response_json).to eq []
+      expect(response_json[:drinks]).to eq []
     end
 
-    it "returns an empty array when a too short search parameter is passed" do
-      get api_search_path(query: "a")
+    it "returns an empty array when a search parameter doesn't match anything" do
+      get api_search_path(query: "xyz")
 
-      response_json = JSON.parse(response.body)
+      response_json = JSON.parse(response.body).deep_symbolize_keys
       expect(response).to have_http_status(200)
-      expect(response_json).to eq []
+      expect(response_json[:drinks]).to eq []
     end
 
     it "returns an empty array when out of bounds pagination parameters are received" do
