@@ -7,9 +7,16 @@ class Cocktail < ApplicationRecord
   validates :name, :category, :container, :instructions, :image, presence: true
   validates :name, uniqueness: true
 
-  scope :search, ->(query, offset = 0, limit = 100) { includes(:ingredients).where("name ILIKE ?", "%#{query}%")
-                                                    .order(name: :asc).offset(offset).limit(limit)
-                    }
+  scope :search, ->(query, offset = 0, limit = 100) do
+    if query.present?
+      includes(:ingredients).where("name ILIKE ?", "%#{query}%")
+                            .order(name: :asc)
+                            .offset(offset)
+                            .limit(limit)
+    else
+      []
+    end
+  end
 
   # Improvement here would be to replace this method with serialization via JBuilder or ActiveModel Serialization
   def as_json(options = nil)
