@@ -57,5 +57,13 @@ RSpec.describe Cocktail, type: :model do
     it "returns records matching the search string" do
       expect(Cocktail.search("vod").to_a).to match_array(matching_cocktails)
     end
+
+    it "returns an empty array if no matching records are found" do
+      expect(Cocktail.search("XYZ").to_a).to eq []
+    end
+
+    it "returns an empty array if no query string is passed" do
+      expect(Cocktail.search(nil).to_a).to eq []
+    end
   end
 end
