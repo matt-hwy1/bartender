@@ -6,12 +6,16 @@ class Api::CocktailsController < ApplicationController
   # Implement full-text searching in the database and queries if it grows in size
 
   def index
-    render json: { drinks: Cocktail.search(query, offset, limit) }
+    render json: { drinks: Cocktail.search(query).with_ingredients.paginate(offset, limit) }
   end
 
   def show
     # Using where here instead of find in order to return an empty array in case the record is not found
-    render json: { drinks: Cocktail.includes(:ingredients).where(id: params[:id]) }
+    render json: { drinks: Cocktail.with_ingredients.detail(params[:id]) }
+  end
+
+  def count
+    render json: { count: Cocktail.search(query).count }
   end
 
   private
