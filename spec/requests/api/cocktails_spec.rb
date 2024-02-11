@@ -67,6 +67,24 @@ RSpec.describe "Api::Cocktails", type: :request do
       expect(drink[:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
     end
 
+    it "queries the database using the received pagination parameters" do
+      ("a".."z").each do |index|
+        FactoryBot.create(:cocktail, name: "Cocktail #{index}")
+      end
+
+      get api_search_path(query: "ocktail", offset: 20, limit: 10)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      drinks = response_json[:drinks]
+
+      expect(response).to have_http_status(200)
+      expect(drinks.size).to eq(6)
+      expected_results = ["Cocktail u", "Cocktail v", "Cocktail w", "Cocktail x", "Cocktail y", "Cocktail z"]
+      expect(drinks.map { |d| d[:name] }).to eq(expected_results)
+    end
+  end
+
+  describe "find one cocktail" do
     it "returns the correct cocktail by id" do
       get api_detail_path(id: cocktail.id)
 
@@ -84,21 +102,23 @@ RSpec.describe "Api::Cocktails", type: :request do
       expect(drink[:ingredients].first[:name]).to eq cocktail.ingredients.first.name
       expect(drink[:ingredients].first[:measurement]).to eq cocktail.ingredients.first.measurement
     end
+  end
 
-    it "queries the database using the received pagination parameters" do
-      ("a".."z").each do |index|
-        FactoryBot.create(:cocktail, name: "Cocktail #{index}")
+  describe "search count" do
+    before do
+      (1..3).each do |i|
+        FactoryBot.create(:cocktail, name: "gin_#{i}")
       end
+    end
 
-      get api_search_path(query: "ocktail", offset: 20, limit: 10)
+    it "returns a valid count" do
+      get api_count_path(query: "gin")
 
       response_json = JSON.parse(response.body).deep_symbolize_keys
-      drinks = response_json[:drinks]
+      count = response_json[:count]
 
       expect(response).to have_http_status(200)
-      expect(drinks.size).to eq(6)
-      expected_results = ["Cocktail u", "Cocktail v", "Cocktail w", "Cocktail x", "Cocktail y", "Cocktail z"]
-      expect(drinks.map { |d| d[:name] }).to eq(expected_results)
+      expect(count).to eq(3)
     end
   end
 end
