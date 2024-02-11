@@ -21,8 +21,24 @@ RSpec.describe "Api::Cocktails", type: :request do
       expect(response_json[:drinks]).to eq []
     end
 
-    it "returns an empty array when out of bounds pagination parameters are received" do
-      get api_search_path(query: query, offset: 5, limit: 10)
+    it "returns an empty array when an out of bounds pagination parameter is received" do
+      get api_search_path(query: query, page: 5, page_size: 10)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      expect(response).to have_http_status(200)
+      expect(response_json[:drinks]).to be_blank
+    end
+
+    it "returns an empty array when a negative page size parameter is received" do
+      get api_search_path(query: query, page: -1)
+
+      response_json = JSON.parse(response.body).deep_symbolize_keys
+      expect(response).to have_http_status(200)
+      expect(response_json[:drinks]).to be_blank
+    end
+
+    it "returns an empty array when a negative page number parameter is received" do
+      get api_search_path(query: query, page: -1)
 
       response_json = JSON.parse(response.body).deep_symbolize_keys
       expect(response).to have_http_status(200)
@@ -50,7 +66,7 @@ RSpec.describe "Api::Cocktails", type: :request do
     end
 
     it "calls the search function with the received pagination parameters" do
-      get api_search_path(query: query, offset: 0, limit: 10)
+      get api_search_path(query: query, page: 1, page_size: 10)
 
       response_json = JSON.parse(response.body).deep_symbolize_keys
       drink = response_json[:drinks].first
@@ -72,7 +88,7 @@ RSpec.describe "Api::Cocktails", type: :request do
         FactoryBot.create(:cocktail, name: "Cocktail #{index}")
       end
 
-      get api_search_path(query: "ocktail", offset: 20, limit: 10)
+      get api_search_path(query: "ocktail", page: 3, page_size: 10)
 
       response_json = JSON.parse(response.body).deep_symbolize_keys
       drinks = response_json[:drinks]

@@ -1,6 +1,6 @@
 class Cocktail < ApplicationRecord
-  OFFSET = 0
-  PAGE_SIZE = 20
+  PAGE = 1
+  PAGE_SIZE = 5
 
   has_many :ingredients, dependent: :destroy
 
@@ -19,7 +19,17 @@ class Cocktail < ApplicationRecord
 
   scope :with_ingredients, -> { includes(:ingredients) }
 
-  scope :paginate, ->(offset, limit) { offset(offset).limit(limit) }
+  scope :paginate, ->(page, page_size) do
+    page_number = page.to_i
+    page_size_number = page_size.to_i
+
+    if page_number < 1 || page_size_number < 1
+      none
+    else
+      offset = (page_number - 1) * page_size_number.to_i
+      offset(offset).limit(page_size_number)
+    end
+  end
 
   # Improvement here would be to replace this method with serialization via JBuilder or ActiveModel Serialization
   def as_json(options = nil)
