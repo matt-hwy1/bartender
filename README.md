@@ -6,6 +6,8 @@ The API lives at
 
 This app uses ruby 3.1.2 rails 7.1.3 with a PostgreSQL database
 
+Clone this application via: `git clone git@github.com:matt-hwy1/bartender.git`
+
 To bootstrap the application you need to create a username/password pair of rails/rails OR
 edit `config/database.yml` and change the username/password to an existing one in your system.
 
@@ -22,9 +24,10 @@ Test the API with [http://localhost:3000/api/search?query=vod](http://localhost:
 
 You should receive a JSON dump of cocktail data
 
-### ## Enhancements I'd add, given time, in rough order of importance
-- I'd version the API, but the requirements stated no version number in the API path, so I omitted this
-- I'd replace the to_json serialization with JBuilder or ActiveModel Serialization
-- I'd create a Docker compose file of both the Rails and React app to run them without manual steps
-- I'd integrate the React front end application into this Rails application. This would also allow me to remove the CORS support I included in the Rails app to allow API requests from another port on localhost
-
+### Enhancements I'd add, given time, in rough order of importance
+- Version the API, but the requirements stated no version number in the API path, so I omitted this
+- Replace the to_json serialization with JBuilder or ActiveModel Serialization
+- Integrate the React front end application into this Rails application. This would integrate both repositories as well as allow me to remove the CORS support I included in the Rails app to allow API requests from another port on localhost
+- Create a Docker compose file of both the Rails and React app to run them without manual steps
+- Authentication of the API, although the requirements stated that it was a public API
+- Implement full-text searching in the database and queries if it grows in size
