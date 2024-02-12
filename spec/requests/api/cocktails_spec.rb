@@ -32,7 +32,7 @@ RSpec.describe 'Api::Cocktails', type: :request do
     end
 
     it 'returns an empty array when a negative page size parameter is received' do
-      get api_search_path(query:, page: -1)
+      get api_search_path(query:, page_size: -1)
 
       response_json = JSON.parse(response.body).deep_symbolize_keys
       expect(response).to have_http_status(200)
