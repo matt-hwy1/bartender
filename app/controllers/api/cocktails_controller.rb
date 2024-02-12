@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   class CocktailsController < ApplicationController
     # Clear improvements here would be:

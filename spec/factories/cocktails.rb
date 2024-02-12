@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :cocktail do
     name { Faker::Beer.name }
@@ -8,7 +10,7 @@ FactoryBot.define do
 
     factory :cocktail_with_ingredients do
       after(:create) do |cocktail, _context|
-        create_list(:ingredient, 1, cocktail: cocktail)
+        create_list(:ingredient, 1, cocktail:)
         cocktail.reload
       end
     end

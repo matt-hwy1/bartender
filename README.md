@@ -26,5 +26,5 @@ You should receive a JSON dump of cocktail data
 - I'd version the API, but the requirements stated no version number in the API path, so I omitted this
 - I'd replace the to_json serialization with JBuilder or ActiveModel Serialization
 - I'd create a Docker compose file of both the Rails and React app to run them without manual steps
-- I'd integrate the React front end application into this Rails application
+- I'd integrate the React front end application into this Rails application. This would also allow me to remove the CORS support I included in the Rails app to allow API requests from another port on localhost
 
