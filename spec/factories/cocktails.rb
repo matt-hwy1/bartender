@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :cocktail do
-    name { Faker::Beer.name }
+    name { Faker::Alphanumeric.alphanumeric(number: 10) }
     category { Faker::Quote.yoda }
     container { Faker::Alphanumeric.alphanumeric(number: 10) }
     instructions { Faker::Food.description }
